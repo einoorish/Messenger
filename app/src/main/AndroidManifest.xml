@@ -11,6 +11,11 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".messages.ChatActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".messages.MessagesActivity"/>
+        </activity>
         <activity android:name=".messages.NewMessageActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

@@ -36,8 +36,63 @@ class MessagesActivity : AppCompatActivity() {
         supportActionBar?.title = "Chats"
 
         verifyIfUserIsLoggedIn()
+
+        listenForLatestMessages()
+        rv_latestMessages.adapter = adapter as RecyclerView.Adapter<*>?
+        rv_latestMessages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+
+        adapter.setOnItemClickListener{item, view ->
+            val intent = Intent(this, ChatActivity::class.java)
+            //tried to do it with parcibles but failed :<
+            val row  = item as LatestMessageRow
+            val user = row.chatPartner
+
+            intent.putExtra(NewMessageActivity.USERNAME_KEY, user!!.username)
+            intent.putExtra(NewMessageActivity.PHOTO_KEY, user.profilePhotoUrl)
+            intent.putExtra(NewMessageActivity.UID_KEY, user.uid)
+            startActivity(intent)
+        }
+
     }
 
+    private fun refreshRvMessages(){
+        adapter.clear()
+        latestMessagesMap.values.forEach{
+            adapter.add(LatestMessageRow(it))
+        }
+
+        //TODO: look for more efficient way
+    }
+
+    private fun listenForLatestMessages(){
+        val fromId = FirebaseAuth.getInstance().uid
+        val ref = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId")
+
+        ref.addChildEventListener(object: ChildEventListener{
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                val chatMessage = p0.getValue(ChatMessage::class.java)?: return
+                latestMessagesMap[p0.key!!] = chatMessage
+                refreshRvMessages()
+            }
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                val chatMessage = p0.getValue(ChatMessage::class.java)?: return
+                latestMessagesMap[p0.key!!] = chatMessage
+                refreshRvMessages()
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+            }
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+
+        })
+
+    }
 
     private fun fetchCurrentUser(uid:String?){
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
