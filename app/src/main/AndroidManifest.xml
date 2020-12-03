@@ -11,9 +11,21 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".messages.NewMessageActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".messages.MessagesActivity"/>
+        </activity>
         <activity android:name=".login.RegistrationActivity">
         </activity>
         <activity android:name=".login.LoginActivity">
+        </activity>
+        <activity android:name=".messages.MessagesActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 
